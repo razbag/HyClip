@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HayClip</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <path
+            d="M10.5 3a7.5 7.5 0 1 0 4.65 13.4l5.23 5.22a1 1 0 0 0 1.41-1.41l-5.22-5.23A7.5 7.5 0 0 0 10.5 3Zm-5.5 7.5a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z"
+          />
+        </svg>
+        <input
+          id="search"
+          type="text"
+          placeholder="Search clipboard history…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <ul id="list" class="list"></ul>
+      <div id="empty" class="empty hidden">
+        <p>No clipboard history yet</p>
+        <span>Copy something to get started</span>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
