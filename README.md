@@ -1,4 +1,5 @@
 # HyClip
+<img width="64" height="64" alt="AppIcon-64" src="https://github.com/user-attachments/assets/b07deab4-893e-420c-9e21-ca885a89dcf9" />
 
 A minimal macOS menu bar clipboard manager. No dock icon, no clutter — just a
 quick way to search and reuse what you've recently copied.
