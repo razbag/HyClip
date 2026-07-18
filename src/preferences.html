@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HayClip Preferences</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="preferences.css" />
+  </head>
+  <body class="prefs-body">
+    <div class="prefs">
+      <div class="prefs-row">
+        <label for="max-history">History size</label>
+        <div class="prefs-input-group">
+          <input id="max-history" type="number" min="1" max="250" step="1" />
+          <span class="prefs-hint">items (1–250)</span>
+        </div>
+      </div>
+      <input id="max-history-slider" type="range" min="1" max="250" step="1" />
+      <p class="prefs-note">
+        HayClip keeps this many recent clipboard entries in memory. Lowering
+        it trims older items immediately.
+      </p>
+    </div>
+    <script src="preferences.js"></script>
+  </body>
+</html>

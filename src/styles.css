@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+:root {
+  --bg: rgba(250, 250, 248, 0.88);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #1c1c1e;
+  --text-dim: rgba(28, 28, 30, 0.5);
+  --item-hover: rgba(0, 0, 0, 0.05);
+  --item-selected: rgba(216, 155, 40, 0.16);
+  --item-selected-border: rgba(216, 155, 40, 0.55);
+  --accent: #d89b28;
+  --scrollbar: rgba(0, 0, 0, 0.18);
+  --input-bg: rgba(0, 0, 0, 0.045);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: rgba(30, 30, 32, 0.82);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f2f2f4;
+    --text-dim: rgba(242, 242, 244, 0.5);
+    --item-hover: rgba(255, 255, 255, 0.06);
+    --item-selected: rgba(245, 197, 90, 0.14);
+    --item-selected-border: rgba(245, 197, 90, 0.5);
+    --accent: #f5c55a;
+    --scrollbar: rgba(255, 255, 255, 0.18);
+    --input-bg: rgba(255, 255, 255, 0.07);
+  }
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-icon {
+  fill: var(--text-dim);
+  flex-shrink: 0;
+}
+
+#search {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  padding: 5px 2px;
+}
+
+#search::placeholder {
+  color: var(--text-dim);
+}
+
+.list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 6px;
+}
+
+.list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 4px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.item:hover {
+  background: var(--item-hover);
+}
+
+.item.selected {
+  background: var(--item-selected);
+  border-color: var(--item-selected-border);
+}
+
+.item-text {
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.item-meta {
+  color: var(--text-dim);
+  font-size: 10.5px;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-dim);
+  padding-bottom: 24px;
+}
+
+.empty p {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.empty span {
+  font-size: 11.5px;
+}
+
+.hidden {
+  display: none !important;
+}
