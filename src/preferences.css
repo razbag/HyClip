@@ -53,11 +53,31 @@
 
 #max-history-slider {
   width: 100%;
-  accent-color: var(--accent, #d89b28);
+  accent-color: var(--accent, #5a91c8);
 }
 
 .prefs-note {
   color: var(--text-dim, rgba(28, 28, 30, 0.5));
   font-size: 11px;
   line-height: 1.5;
+}
+
+.prefs-divider {
+  height: 1px;
+  background: var(--border, rgba(0, 0, 0, 0.1));
+}
+
+.prefs-checkbox-row {
+  cursor: pointer;
+}
+
+.prefs-checkbox-row span {
+  color: var(--text, #1c1c1e);
+  font-weight: 500;
+}
+
+#launch-at-login {
+  accent-color: var(--accent, #5a91c8);
+  width: 16px;
+  height: 16px;
 }

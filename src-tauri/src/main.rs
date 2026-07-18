@@ -10,8 +10,8 @@ use serde::Serialize;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Emitter, Manager, State, WindowEvent};
+use tauri_plugin_autostart::{ManagerExt as AutostartManagerExt, MacosLauncher};
 use tauri_plugin_clipboard_manager::ClipboardExt;
-use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 const DEFAULT_MAX_HISTORY: usize = 50;
@@ -19,7 +19,8 @@ const MIN_MAX_HISTORY: usize = 1;
 const ABSOLUTE_MAX_HISTORY: usize = 250;
 const POPUP_LABEL: &str = "popup";
 const PREFERENCES_LABEL: &str = "preferences";
-const TRAY_ID: &str = "hayclip-tray";
+const ABOUT_LABEL: &str = "about";
+const TRAY_ID: &str = "hyclip-tray";
 
 struct ClipboardState {
     history: VecDeque<String>,
@@ -100,18 +101,35 @@ fn hide_popup_cmd(app: AppHandle) {
 }
 
 #[derive(Serialize, Clone)]
+struct AboutInfo {
+    name: String,
+    version: String,
+}
+
+#[tauri::command]
+fn get_about_info(app: AppHandle) -> AboutInfo {
+    let info = app.package_info();
+    AboutInfo {
+        name: info.name.clone(),
+        version: info.version.to_string(),
+    }
+}
+
+#[derive(Serialize, Clone)]
 struct PreferencesPayload {
     max_history: usize,
     min: usize,
     max: usize,
+    launch_at_login: bool,
 }
 
 #[tauri::command]
-fn get_preferences(state: State<SharedState>) -> PreferencesPayload {
+fn get_preferences(app: AppHandle, state: State<SharedState>) -> PreferencesPayload {
     PreferencesPayload {
         max_history: state.lock().unwrap().max_history,
         min: MIN_MAX_HISTORY,
         max: ABSOLUTE_MAX_HISTORY,
+        launch_at_login: app.autolaunch().is_enabled().unwrap_or(false),
     }
 }
 
@@ -123,6 +141,20 @@ fn set_max_history(app: AppHandle, state: State<SharedState>, value: usize) -> u
     guard.trim();
     emit_history(&app, &guard);
     clamped
+}
+
+#[tauri::command]
+fn set_launch_at_login(app: AppHandle, enabled: bool) -> bool {
+    let autolaunch = app.autolaunch();
+    let result = if enabled {
+        autolaunch.enable()
+    } else {
+        autolaunch.disable()
+    };
+    if let Err(err) = result {
+        eprintln!("[hyclip] failed to update launch-at-login: {err}");
+    }
+    autolaunch.is_enabled().unwrap_or(false)
 }
 
 fn hide_popup(app: &AppHandle) {
@@ -172,14 +204,11 @@ fn show_popup(app: &AppHandle) {
 }
 
 fn show_about(app: &AppHandle) {
-    let version = app.package_info().version.to_string();
-    app.dialog()
-        .message(format!(
-            "HayClip v{version}\nA minimal clipboard manager for your menu bar.\n\nBy Razmik Baghdasaryan\nMIT License"
-        ))
-        .title("About HayClip")
-        .kind(MessageDialogKind::Info)
-        .show(|_| {});
+    if let Some(window) = app.get_webview_window(ABOUT_LABEL) {
+        let _ = window.center();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
 }
 
 fn show_preferences(app: &AppHandle) {
@@ -200,6 +229,27 @@ fn toggle_popup(app: &AppHandle) {
             show_popup(app);
         }
     }
+}
+
+/// Enables "launch at login" the very first time HyClip ever runs, then
+/// leaves the user's choice (on or off) alone on every later launch. A tiny
+/// marker file in the app's data dir is the only thing that needs to persist
+/// for this — the login-item state itself is already persisted by macOS.
+fn apply_first_run_defaults(app: &AppHandle) {
+    let Ok(data_dir) = app.path().app_data_dir() else {
+        return;
+    };
+    if std::fs::create_dir_all(&data_dir).is_err() {
+        return;
+    }
+    let marker = data_dir.join(".defaults-applied");
+    if marker.exists() {
+        return;
+    }
+    if let Err(err) = app.autolaunch().enable() {
+        eprintln!("[hyclip] failed to enable default launch-at-login: {err}");
+    }
+    let _ = std::fs::write(&marker, b"");
 }
 
 fn start_clipboard_watcher(app: AppHandle) {
@@ -225,7 +275,10 @@ fn start_clipboard_watcher(app: AppHandle) {
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, shortcut, event| {
@@ -244,7 +297,9 @@ fn main() {
             clear_history,
             hide_popup_cmd,
             get_preferences,
-            set_max_history
+            set_max_history,
+            set_launch_at_login,
+            get_about_info
         ])
         .setup(|app| {
             #[cfg(target_os = "macos")]
@@ -253,12 +308,14 @@ fn main() {
             let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SUPER), Code::KeyV);
             app.global_shortcut().register(shortcut)?;
 
-            let about_item = MenuItemBuilder::with_id("about", "About HayClip").build(app)?;
-            let show_item = MenuItemBuilder::with_id("show", "Show HayClip").build(app)?;
+            apply_first_run_defaults(app.handle());
+
+            let about_item = MenuItemBuilder::with_id("about", "About HyClip").build(app)?;
+            let show_item = MenuItemBuilder::with_id("show", "Show HyClip").build(app)?;
             let clear_item = MenuItemBuilder::with_id("clear", "Clear History").build(app)?;
             let preferences_item =
                 MenuItemBuilder::with_id("preferences", "Preferences…").build(app)?;
-            let quit_item = MenuItemBuilder::with_id("quit", "Quit HayClip").build(app)?;
+            let quit_item = MenuItemBuilder::with_id("quit", "Quit HyClip").build(app)?;
             let menu = MenuBuilder::new(app)
                 .items(&[&about_item])
                 .separator()
@@ -316,5 +373,5 @@ fn main() {
             }
         })
         .run(tauri::generate_context!())
-        .expect("error while running HayClip");
+        .expect("error while running HyClip");
 }

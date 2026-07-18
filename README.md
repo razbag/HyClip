@@ -1,4 +1,4 @@
-# HayClip
+# HyClip
 
 A minimal macOS menu bar clipboard manager. No dock icon, no clutter — just a
 quick way to search and reuse what you've recently copied.
@@ -30,13 +30,19 @@ cargo tauri dev
 cargo tauri build
 ```
 
-Produces a signed-for-local-use `.app` (and `.dmg`) under
-`src-tauri/target/release/bundle/`.
+Produces a `.app` (and `.dmg`) under `src-tauri/target/release/bundle/`.
+
+The build is unsigned and not notarized, so macOS Gatekeeper will flag it as
+being from an unidentified developer. Right-click the app (or the mounted
+`.dmg`) and choose **Open** the first time to bypass this.
 
 ## Notes
 
-History is stored in memory only and resets when the app quits. Preferences
-(history size) are also in-memory for now.
+- History is stored in memory only and resets when the app quits. Preferences
+  (history size) are also in-memory for now.
+- HyClip does not currently filter out clipboard entries marked "concealed" by
+  password managers (e.g. 1Password, Bitwarden) — anything copied gets stored
+  like any other text. Keep this in mind if you copy sensitive data often.
 
 ## License
 

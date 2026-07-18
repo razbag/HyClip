@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HayClip Preferences</title>
+    <title>HyClip Preferences</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="preferences.css" />
   </head>
@@ -18,9 +18,16 @@
       </div>
       <input id="max-history-slider" type="range" min="1" max="250" step="1" />
       <p class="prefs-note">
-        HayClip keeps this many recent clipboard entries in memory. Lowering
+        HyClip keeps this many recent clipboard entries in memory. Lowering
         it trims older items immediately.
       </p>
+
+      <div class="prefs-divider"></div>
+
+      <label class="prefs-row prefs-checkbox-row">
+        <span>Launch HyClip at login</span>
+        <input id="launch-at-login" type="checkbox" />
+      </label>
     </div>
     <script src="preferences.js"></script>
   </body>
