@@ -1,7 +1,9 @@
 const { invoke } = window.__TAURI__.core;
+const { listen } = window.__TAURI__.event;
 
 const numberInput = document.getElementById("max-history");
 const rangeInput = document.getElementById("max-history-slider");
+const launchAtLoginInput = document.getElementById("launch-at-login");
 
 function setBoth(value) {
   numberInput.value = value;
@@ -15,6 +17,7 @@ async function loadPreferences() {
   rangeInput.min = prefs.min;
   rangeInput.max = prefs.max;
   setBoth(prefs.max_history);
+  launchAtLoginInput.checked = prefs.launch_at_login;
 }
 
 async function applyValue(rawValue) {
@@ -43,4 +46,11 @@ numberInput.addEventListener("change", () => {
   applyValue(numberInput.value);
 });
 
-document.addEventListener("DOMContentLoaded", loadPreferences);
+launchAtLoginInput.addEventListener("change", async () => {
+  const result = await invoke("set_launch_at_login", {
+    enabled: launchAtLoginInput.checked,
+  });
+  launchAtLoginInput.checked = result;
+});
+
+listen("preferences-shown", loadPreferences);

@@ -1,9 +1,13 @@
 [package]
-name = "hayclip"
+name = "hyclip"
 version = "0.1.0"
 description = "A minimal menu bar clipboard manager"
 authors = ["Razmik Baghdasaryan"]
 edition = "2021"
+
+[[bin]]
+name = "HyClip"
+path = "src/main.rs"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
@@ -12,7 +16,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = ["macos-private-api", "tray-icon", "image-png"] }
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-clipboard-manager = "2"
-tauri-plugin-dialog = "2"
+tauri-plugin-autostart = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
