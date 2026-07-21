@@ -33,9 +33,21 @@ cargo tauri build
 
 Produces a `.app` (and `.dmg`) under `src-tauri/target/release/bundle/`.
 
-The build is unsigned and not notarized, so macOS Gatekeeper will flag it as
-being from an unidentified developer. Right-click the app (or the mounted
-`.dmg`) and choose **Open** the first time to bypass this.
+The build is ad-hoc signed but not notarized (no paid Apple Developer
+account), so macOS Gatekeeper will still flag it once downloaded. If
+right-click → **Open** doesn't get you past the warning, or macOS says the
+app **"is damaged and can't be opened"** (a misleading message — it isn't
+actually damaged, Gatekeeper just refuses unnotarized downloads by default),
+open Terminal and run:
+
+```sh
+xattr -cr /path/to/HyClip.app
+```
+
+(e.g. `xattr -cr /Applications/HyClip.app` if you moved it there, or
+`xattr -cr ~/Downloads/HyClip.app` otherwise). This removes the quarantine
+flag macOS attaches to anything downloaded from a browser and always
+resolves the "damaged" message.
 
 ## Notes
 
