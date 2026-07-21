@@ -7,11 +7,14 @@ quick way to search and reuse what you've recently copied.
 ## Features
 
 - Lives entirely in the menu bar — no dock icon, no main window
-- Keeps your last N copied text items in memory (default 50, adjustable up to 250)
+- Keeps your last N copied text items, saved to disk (default 50, adjustable up to 250)
+- Retention policy — auto-expire items after 1 week, 1 month, or keep forever
 - Global shortcut **⌃⌘V** opens a small search popup near the menu bar icon
 - Type to filter, arrow keys to navigate, **Return** or click to copy an item back
 - Dark-mode aware, minimal UI
-- Tray menu: About, Show, Preferences, Clear History, Quit
+- In-app auto-update — checks on launch and every 24 hours, always asks
+  before installing
+- Tray menu: About, Check for Updates, Show, Preferences, Clear History, Quit
 
 ## Requirements
 
@@ -49,13 +52,38 @@ xattr -cr /path/to/HyClip.app
 flag macOS attaches to anything downloaded from a browser and always
 resolves the "damaged" message.
 
+## Releasing a new version
+
+1. Bump `version` in `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
+2. Build with the updater signing key set (private key lives outside the
+   repo, never commit it):
+   ```sh
+   TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/hyclip.key)" \
+   TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
+   cargo tauri build
+   ```
+3. This produces, under `src-tauri/target/release/bundle/`:
+   - `dmg/HyClip_<version>_aarch64.dmg` — what people download to install
+   - `macos/HyClip.app.tar.gz` + `.sig` — the updater artifact + signature
+4. Build a `latest.json` manifest (see `tauri-plugin-updater` docs for the
+   schema) using the contents of the `.sig` file, and a `pub_date` in RFC3339
+   format.
+5. Tag the commit (`git tag -a vX.Y.Z`), push it, then create a GitHub
+   release for that tag with three assets attached: the `.dmg`, the
+   `.app.tar.gz`, and `latest.json`. The updater's endpoint always points at
+   `.../releases/latest/download/latest.json`, so it just needs to exist on
+   whichever release GitHub currently considers "latest".
+
 ## Notes
 
-- History is stored in memory only and resets when the app quits. Preferences
-  (history size) are also in-memory for now.
+- History and preferences are saved as plain JSON in
+  `~/Library/Application Support/HyClip/` (`history.json`, `preferences.json`)
+  and persist across restarts. Use Preferences → **Delete All History…** to
+  wipe it (asks for confirmation first).
 - HyClip does not currently filter out clipboard entries marked "concealed" by
   password managers (e.g. 1Password, Bitwarden) — anything copied gets stored
-  like any other text. Keep this in mind if you copy sensitive data often.
+  like any other text, on disk, indefinitely if retention is set to Forever.
+  Keep this in mind if you copy sensitive data often.
 
 ## License
 
