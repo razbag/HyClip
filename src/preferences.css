@@ -1,6 +1,8 @@
 .prefs-body {
   background: var(--bg, #f5f5f7);
   height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,8 +14,8 @@
 .prefs {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 10px;
+  padding: 16px 20px;
 }
 
 .prefs-row {
@@ -80,4 +82,54 @@
   accent-color: var(--accent, #5a91c8);
   width: 16px;
   height: 16px;
+}
+
+#retention-select {
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.15));
+  background: var(--input-bg, rgba(0, 0, 0, 0.045));
+  color: var(--text, #1c1c1e);
+  font-size: 12.5px;
+}
+
+.danger-btn {
+  border: 1px solid rgba(217, 84, 79, 0.4);
+  background: rgba(217, 84, 79, 0.08);
+  color: #d9544f;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+.danger-btn:hover {
+  background: rgba(217, 84, 79, 0.16);
+}
+
+#cancel-delete {
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.15));
+  background: var(--input-bg, rgba(0, 0, 0, 0.045));
+  color: var(--text, #1c1c1e);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.prefs-warning {
+  color: #d9544f;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.confirm-actions .danger-btn {
+  flex: 1;
 }

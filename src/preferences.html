@@ -18,8 +18,23 @@
       </div>
       <input id="max-history-slider" type="range" min="1" max="250" step="1" />
       <p class="prefs-note">
-        HyClip keeps this many recent clipboard entries in memory. Lowering
-        it trims older items immediately.
+        HyClip keeps this many recent clipboard entries, saved to disk.
+        Lowering it trims older items immediately.
+      </p>
+
+      <div class="prefs-divider"></div>
+
+      <div class="prefs-row">
+        <label for="retention-select">Keep history for</label>
+        <select id="retention-select">
+          <option value="week">1 week</option>
+          <option value="month">1 month</option>
+          <option value="forever">Forever</option>
+        </select>
+      </div>
+      <p class="prefs-note">
+        Items older than this are removed automatically, regardless of the
+        history size above.
       </p>
 
       <div class="prefs-divider"></div>
@@ -28,6 +43,26 @@
         <span>Launch HyClip at login</span>
         <input id="launch-at-login" type="checkbox" />
       </label>
+
+      <div class="prefs-divider"></div>
+
+      <div id="delete-prompt">
+        <button id="delete-history-btn" class="danger-btn">
+          Delete All History…
+        </button>
+      </div>
+      <div id="delete-confirm" class="hidden">
+        <p class="prefs-note prefs-warning">
+          This permanently deletes all saved clipboard history. This can't be
+          undone.
+        </p>
+        <div class="confirm-actions">
+          <button id="cancel-delete">Cancel</button>
+          <button id="confirm-delete" class="danger-btn">
+            Delete Forever
+          </button>
+        </div>
+      </div>
     </div>
     <script src="preferences.js"></script>
   </body>

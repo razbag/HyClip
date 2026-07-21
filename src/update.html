@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HyClip Update</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="update.css" />
+  </head>
+  <body class="update-body">
+    <div class="update">
+      <div id="state-checking" class="update-state">
+        <p class="update-title">Checking for updates…</p>
+      </div>
+
+      <div id="state-uptodate" class="update-state hidden">
+        <p class="update-title">You're up to date</p>
+        <p class="update-sub" id="uptodate-version"></p>
+        <div class="update-actions">
+          <button id="ok-btn" class="primary-btn">OK</button>
+        </div>
+      </div>
+
+      <div id="state-available" class="update-state hidden">
+        <p class="update-title">Update Available</p>
+        <p class="update-sub" id="version-label"></p>
+        <div class="update-notes" id="update-notes"></div>
+        <div class="update-actions">
+          <button id="later-btn">Later</button>
+          <button id="install-btn" class="primary-btn">Update Now</button>
+        </div>
+      </div>
+
+      <div id="state-installing" class="update-state hidden">
+        <p class="update-title">Downloading and installing…</p>
+        <p class="update-sub">HyClip will restart automatically.</p>
+      </div>
+
+      <div id="state-error" class="update-state hidden">
+        <p class="update-title update-error-title">Update failed</p>
+        <p class="update-sub" id="error-message"></p>
+        <div class="update-actions">
+          <button id="error-ok-btn" class="primary-btn">OK</button>
+        </div>
+      </div>
+    </div>
+    <script src="update.js"></script>
+  </body>
+</html>
