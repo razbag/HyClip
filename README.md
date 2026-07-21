@@ -88,3 +88,7 @@ resolves the "damaged" message.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+Built with the help of [Claude](https://claude.ai).
