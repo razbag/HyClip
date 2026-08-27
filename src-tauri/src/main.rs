@@ -297,7 +297,24 @@ async fn install_update(app: AppHandle, resource_id: tauri::ResourceId) -> Resul
         .download_and_install(|_, _| {}, || {})
         .await
         .map_err(|e| e.to_string())?;
-    app.restart();
+    relaunch_and_exit();
+}
+
+// `AppHandle::restart()` spawns the new process while this one is still
+// alive, and macOS's LaunchServices sometimes kills the new instance as a
+// "duplicate" of a menu-bar/accessory app before it finishes registering.
+// Relaunching via `open -n` after this process has fully exited avoids the
+// overlap.
+fn relaunch_and_exit() -> ! {
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(bundle) = exe.parent().and_then(|p| p.parent()).and_then(|p| p.parent()) {
+            let _ = std::process::Command::new("/bin/sh")
+                .arg("-c")
+                .arg(format!("sleep 1 && open -n {:?}", bundle))
+                .spawn();
+        }
+    }
+    std::process::exit(0);
 }
 
 const UPDATE_CHECK_INTERVAL: Duration = Duration::from_secs(24 * 3600);
