@@ -1,6 +1,6 @@
 [package]
 name = "hyclip"
-version = "0.2.0"
+version = "0.2.1"
 description = "A minimal menu bar clipboard manager"
 authors = ["Razmik Baghdasaryan"]
 edition = "2021"
