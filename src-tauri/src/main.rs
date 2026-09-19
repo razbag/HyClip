@@ -8,7 +8,7 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use tauri::menu::{MenuBuilder, MenuItemBuilder};
+use tauri::menu::{ContextMenu, MenuBuilder, MenuItemBuilder};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Emitter, Manager, State, WindowEvent};
 use tauri_plugin_autostart::{ManagerExt as AutostartManagerExt, MacosLauncher};
@@ -590,28 +590,42 @@ fn main() {
                 "../icons/tray-icon.png"
             ))?;
 
+            // The menu is deliberately NOT attached to the status item. On macOS
+            // 27 AppKit pops an attached `NSStatusItem.menu` on every click and
+            // swallows the event before tray-icon sees it, so left click could
+            // never toggle the popup. Instead we show the menu ourselves on
+            // right click.
+            app.on_menu_event(|app, event| match event.id().as_ref() {
+                "about" => show_about(app),
+                "show" => show_popup(app),
+                "clear" => clear_history_internal(app),
+                "preferences" => show_preferences(app),
+                "check-updates" => show_update_window(app),
+                "quit" => app.exit(0),
+                _ => {}
+            });
+
+            let tray_menu = menu.clone();
             TrayIconBuilder::with_id(TRAY_ID)
                 .icon(tray_icon)
                 .icon_as_template(true)
-                .menu(&menu)
-                .show_menu_on_left_click(false)
-                .on_menu_event(|app, event| match event.id().as_ref() {
-                    "about" => show_about(app),
-                    "show" => show_popup(app),
-                    "clear" => clear_history_internal(app),
-                    "preferences" => show_preferences(app),
-                    "check-updates" => show_update_window(app),
-                    "quit" => app.exit(0),
-                    _ => {}
-                })
-                .on_tray_icon_event(|tray, event| {
+                .on_tray_icon_event(move |tray, event| {
                     if let TrayIconEvent::Click {
-                        button: tauri::tray::MouseButton::Left,
+                        button,
                         button_state: tauri::tray::MouseButtonState::Up,
                         ..
                     } = event
                     {
-                        toggle_popup(tray.app_handle());
+                        let app = tray.app_handle();
+                        match button {
+                            tauri::tray::MouseButton::Left => toggle_popup(app),
+                            tauri::tray::MouseButton::Right => {
+                                if let Some(window) = app.get_webview_window(POPUP_LABEL) {
+                                    let _ = tray_menu.popup(window.as_ref().window());
+                                }
+                            }
+                            _ => {}
+                        }
                     }
                 })
                 .build(app)?;
